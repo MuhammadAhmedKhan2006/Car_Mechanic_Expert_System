@@ -5,10 +5,9 @@ It gives a suggestion, explains and defends it, and can be switched between Engl
 with one button. Beautiful animated interface, works on phones.
 
 ## Files
-- `car_ai.py`                the complete Streamlit app (built-in SQLite, no other libraries)
+- `car_ai.py`                the complete Streamlit app (no other libraries needed)
 - `requirements.txt`         contains `streamlit` (used when you deploy online)
 - `.streamlit/config.toml`   light theme colours (upload this folder too when you deploy)
-- `car_ai.db`                created automatically on the first run (SQLite database)
 
 ## Run on your computer
 1. Install Python 3.9+ (tick "Add Python to PATH" on Windows).
@@ -26,8 +25,6 @@ with one button. Beautiful animated interface, works on phones.
 3. Go to https://share.streamlit.io , sign in with GitHub and click "Create app".
 4. Choose the repository, branch `main`, main file path `car_ai.py`, then click Deploy.
 5. After 1-3 minutes you get a public link like https://your-app-name.streamlit.app
-Note: on the free cloud the SQLite file is reset whenever the app restarts or sleeps.
-Use your own computer when you need the saved records to stay permanently.
 
 ## What it does
 - 10 car problems: engine won't start, overheating, brakes, strange noise/vibration,
@@ -44,7 +41,5 @@ Use your own computer when you need the saved records to stay permanently.
 - UI: animated gradient hero with a driving car, question cards with progress bar, animated
   risk meter, pulsing emergency card, balloons for a good result, mobile responsive layout
   (Yes/No buttons stay side by side on phones), full English/Urdu switch with right-to-left layout
-- Every final result is saved in SQLite (table `consultations`);
-  the sidebar button "View Saved Data" shows all rows
 - Safe wording: it never gives a final diagnosis; it always says to get the car checked
   by a qualified mechanic (or to stop the car and call a tow truck in an emergency)
