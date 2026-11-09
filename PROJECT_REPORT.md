@@ -16,6 +16,10 @@
 ## 3. Project Overview / Explanation of the Project
 
 This project is a **rule-based expert system** built with Python and the Streamlit library.
+It does BOTH **decision making** (it decides an urgency level and whether the car is safe
+to drive) AND **decision support** (it explains and defends its suggestion, gives an
+action plan and a report the owner can show to a mechanic).
+
 A user answers a few Yes/No questions about their car problem. The system:
 
 - asks questions through a **decision tree** (one of 10 car problem categories),
@@ -72,12 +76,17 @@ s = st.session_state
 
 ```python
 def reset_system():
+    s = st.session_state
     s.step = 'start'
     s.patient_data = {}
     s.report_data = {}
     s.risk = 0
     s.reasons = []
+    s.balloons_done = False
     s.area = "-|-"
+    s.triage = {}
+    s.tri_match = ''
+    s.notice = ''
 ```
 
 ### 5.2 Language system
@@ -85,24 +94,25 @@ def reset_system():
 `T(en, ur)` returns English or Urdu depending on `s.lang`:
 
 ```python
-L = s.lang
-
 def T(en, ur):
-    return en if L == 'en' else ur
+    return en if st.session_state.lang == 'en' else ur
 ```
 
 Every screen text is written as `T('English text', 'اردو متن')`.
 The language button only switches `'en' <-> 'ur'`.
 
-### 5.3 Question helper
+### 5.3 Question cards
+
+Each question is drawn as a styled card (`qcard`) with a progress bar and a
+"Q n / 6" label, built with `st.markdown(..., unsafe_allow_html=True)`:
 
 ```python
-def q(text, num, pct):
-    st.progress(pct / 100)
-    st.write(str(num) + "  —  " + text)
+st.markdown("<div class='qcard'><div class='qtop'><span class='qno'>" + QN + "1 / 6</span>"
+            "<div class='qbar'><span style='width:14%'></span></div></div>"
+            "<div class='qtext'>" + T('When you turn the key, ...', '...') + "</div></div>",
+            unsafe_allow_html=True)
+c1, c2 = st.columns(2)   # Yes / No buttons side by side (mobile friendly)
 ```
-
-This draws the progress bar, the question number (e.g. "Q 2 / 6") and the question text.
 
 ### 5.4 The decision tree
 
@@ -122,13 +132,12 @@ Example of one question:
 
 ```python
 elif step == 'ns1':
-    q(T('When you turn the key, do the dashboard lights stay completely off?',
-        'چابی گھمانے پر کیا ڈیش بورڈ کی لائٹس بالکل بند رہتی ہیں؟'), QN + "1 / 6", 14)
+    st.markdown("<div class='qcard'>... question card ...</div>", unsafe_allow_html=True)
     c1, c2 = st.columns(2)
     if c1.button(YES, key="ns1y", type="primary"):
         s.patient_data['dash_lights_off'] = "Yes"
         s.risk = s.risk + 15
-        s.reasons.append("Dashboard lights completely off: +15 risk|ڈیش بورڈ کی لائٹس بالکل بند: +15 رسک|15")
+        s.reasons.append("Dashboard lights completely off: +15 risk|...|15")
         s.step = 'ns2'; st.rerun()
     if c2.button(NO, key="ns1n"):
         s.patient_data['dash_lights_off'] = "No"
@@ -142,15 +151,33 @@ Important points:
 - Emergency signs force a high score: `s.risk = max(s.risk + 40, 70)`.
 - Reasons are saved as `"English|Urdu|points"` so any language can be shown later.
 
-### 5.5 Report-value inputs
+### 5.5 Guided mode (for users who do not know their problem)
+
+The start screen has a second button: **"I don't know my problem - ask me questions"**.
+This runs 16 screening questions (`tri1` … `tri16`). Every "Yes" answer adds votes to
+the problem categories it could mean, stored in `s.triage`:
+
+```python
+elif step == 'tri5':
+    # "The temperature gauge is in the red, or steam comes from under the bonnet."
+    if c1.button(YES, key="tri5y", type="primary"):
+        s.triage['oh'] = s.triage.get('oh', 0) + 4
+        s.step = 'tri6'; st.rerun()
+```
+
+After the last question, `tri_end` picks the category with the most votes and
+`tri_result` shows the conclusion (matched problem + possible area) with a
+**Continue** button that jumps into that problem's normal question set — so the
+rest of the flow (scoring, defence, report) is identical for both modes.
+
+### 5.6 Report-value inputs
 
 Some steps ask for a number (battery voltage, temperature, oil level, tyre pressure, km).
 `st.number_input` collects the value and the code adds risk depending on the range:
 
 ```python
 elif step == 'ns_bat':
-    report_input()
-    st.info(T('📄 Enter the battery voltage ...', '📄 ...'))
+    st.info(T('Enter the battery voltage ...', '...'))
     val = st.number_input(T('Battery voltage (V)', 'بیٹری وولٹیج (وولٹ)'),
                           min_value=0.0, max_value=20.0, value=12.6, step=0.1,
                           format="%.1f", key="ns_bat_in")
@@ -166,7 +193,7 @@ elif step == 'ns_bat':
         st.rerun()
 ```
 
-### 5.6 Final decision (`step == 'end'`)
+### 5.7 Final decision (`step == 'end'`)
 
 The score is turned into a level with simple `if / elif`:
 
@@ -202,11 +229,11 @@ The report is just a text string:
 hr = T('CAR CHECK REPORT ...', '...') + "\n"
 hr = hr + T('Date: ', 'تاریخ: ') + datetime.now().strftime("%Y-%m-%d %H:%M") + "\n"
 # ... more lines ...
-st.download_button('📄 Download Mechanic Report', data=hr,
-                   file_name="mechanic_report.txt", mime="text/plain")
+st.download_button(T('Download Report', 'رپورٹ ڈاؤن لوڈ کریں'), data=hr,
+                   file_name="mechanic_report.txt", mime="text/plain", key="dl")
 ```
 
-### 5.7 Design ideas used
+### 5.8 Design ideas used
 
 - **Decision tree** instead of a flat questionnaire — each answer leads to the next question.
 - **Weighted scoring** — different symptoms add different risk points.
@@ -238,7 +265,7 @@ voice input, more languages, or a mobile app.]
 
 ```bash
 pip install streamlit
-streamlit run car_ai.py
+streamlit run car_ai.py   # codebase.py must be in the same folder
 ```
 
 Live demo: https://carmechanicexpertsystem-u5bxxwfrhat8mvdljvpjme.streamlit.app/
