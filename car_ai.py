@@ -36,7 +36,7 @@ html, body, .stApp, button, input, textarea {font-family: 'Segoe UI', 'Noto Nask
 .stApp p, .stApp li, .stApp label, .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp span, .stApp div[data-testid="stMarkdownContainer"] {color: var(--txt);}
 .block-container {max-width: 860px; padding-top: 2rem;}
 [data-testid="stSidebar"] {background: linear-gradient(180deg, var(--card), var(--side2)) !important; border-right: 1px solid var(--line);}
-h1 {font-weight: 800 !important; color: var(--head) !important; letter-spacing: -0.5px; animation: fadeUp .6s ease both;}
+h1 {font-weight: 800 !important; color: var(--head) !important; letter-spacing: -0.5px; animation: fadeUp .6s ease both; display: inline-block; border-bottom: 3px solid var(--head); padding-bottom: 6px;}
 @keyframes bgshift {0% {background-position: 0% 50%;} 50% {background-position: 100% 50%;} 100% {background-position: 0% 50%;}}
 @keyframes fadeUp {from {opacity: 0; transform: translateY(14px);} to {opacity: 1; transform: translateY(0);}}
 @keyframes grow {from {width: 0;}}
@@ -128,11 +128,12 @@ st.markdown("<div class='hero'><div class='tag'>" + (T('Decide. Defend. Drive sa
 st.warning(T(' Disclaimer: This is a DECISION SUPPORT tool, NOT a replacement for a qualified mechanic. It never gives a final diagnosis. Always get your car checked by a qualified mechanic.', ' اعلان: یہ صرف فیصلہ سازی میں مدد کا ٹول ہے، کسی مستند مکینک کا متبادل نہیں۔ یہ کبھی حتمی تشخیص نہیں دیتا۔ اپنی گاڑی ہمیشہ کسی مستند مکینک سے چیک کروائیں۔'))
 _next_lang = {'en': 'ur', 'ur': 'en'}
 _lang_label = {'en': ' English', 'ur': ' اردو'}
-if st.button(_lang_label[_next_lang[L]], key="lang_btn"):
+_lc, _tc = st.columns(2)
+if _lc.button(_lang_label[_next_lang[L]], key="lang_btn"):
     s.lang = _next_lang[L]; st.rerun()
 
 # ---------- Theme toggle: light / dark ----------
-if st.button(T('Dark mode', 'ڈارک موڈ') if s.theme == 'light' else T('Light mode', 'لائٹ موڈ'), key='theme_btn'):
+if _tc.button(T('Dark mode', 'ڈارک موڈ') if s.theme == 'light' else T('Light mode', 'لائٹ موڈ'), key='theme_btn'):
     s.theme = 'dark' if s.theme == 'light' else 'light'; st.rerun()
 
 # ---------- The expert system (all questions, rules, scoring, report) ----------

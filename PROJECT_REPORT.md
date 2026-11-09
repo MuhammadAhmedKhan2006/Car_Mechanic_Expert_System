@@ -40,11 +40,12 @@ It is a **decision support tool only — it never gives a final diagnosis**.
 - Light and dark theme toggle; fully mobile-responsive layout.
 - 10 problem categories: engine won't start, overheating, brakes, strange noise/vibration,
   battery/electrical/lights, tyres, oil leak/smoke, AC, steering, gear/clutch.
-- 6 guided questions per category (60 Yes/No questions total).
-- 10 optional report-value inputs (battery voltage, engine temperature, oil level,
-  tyre pressure, km since service).
+- 86 questions in total: 60 Yes/No symptom questions (6 per category) + 16 guided
+  screening questions + 10 report-value inputs (battery voltage, engine temperature,
+  oil level, tyre pressure, km since service).
+- Over 300 `if / elif / else` decision conditions in the code (far above the 50 minimum).
 - Risk scoring with emergency minimums (`max(risk + points, 70)`).
-- Bilingual UI: every text is stored as "English|Urdu".
+- Bilingual UI: English and Urdu only (one button switches; Urdu uses right-to-left layout).
 - Downloadable mechanic handover report (.txt file).
 - "Why this decision?" and "Defending this suggestion" explainability sections.
 
@@ -240,4 +241,4 @@ pip install streamlit
 streamlit run car_ai.py
 ```
 
-Live demo: [ADD YOUR NEW STREAMLIT CLOUD LINK HERE]
+Live demo: https://carmechanicexpertsystem-u5bxxwfrhat8mvdljvpjme.streamlit.app/
