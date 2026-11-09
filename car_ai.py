@@ -34,6 +34,7 @@ CSS = """<style>
 html, body, .stApp, button, input, textarea {font-family: 'Segoe UI', 'Noto Naskh Arabic', 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', Tahoma, Arial, sans-serif;}
 .stApp {background: linear-gradient(135deg, var(--bg1) 0%, var(--bg2) 45%, var(--bg3) 100%) !important; background-size: 300% 300% !important; animation: bgshift 20s ease infinite; color: var(--txt);}
 .stApp p, .stApp li, .stApp label, .stApp h1, .stApp h2, .stApp h3, .stApp h4, .stApp span, .stApp div[data-testid="stMarkdownContainer"] {color: var(--txt);}
+.stApp [data-testid="stAlert"], .stApp [data-testid="stAlert"] * {color: #14213D !important;}
 .block-container {max-width: 860px; padding-top: 2rem;}
 [data-testid="stSidebar"] {background: linear-gradient(180deg, var(--card), var(--side2)) !important; border-right: 1px solid var(--line);}
 h1 {font-weight: 800 !important; color: var(--head) !important; letter-spacing: -0.5px; animation: fadeUp .6s ease both; display: inline-block; border-bottom: 3px solid var(--head); padding-bottom: 6px;}
