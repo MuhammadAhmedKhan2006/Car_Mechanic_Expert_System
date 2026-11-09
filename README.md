@@ -24,10 +24,12 @@ with one button. Beautiful animated interface, works on phones.
 
 ## Get the live (WAN) link - Streamlit Community Cloud, free
 1. Create a free GitHub account and a new PUBLIC repository (for example `car-mechanic-ai`).
-2. Upload `car_ai.py`, `requirements.txt` and the `.streamlit` folder to the repository
-   (Add file -> Upload files; drag the whole folder content).
-3. Go to https://share.streamlit.io , sign in with GitHub and click "Create app".
-4. Choose the repository, branch `main`, main file path `car_ai.py`, then click Deploy.
+2. Create a free GitHub account and a PUBLIC repository (or use the existing one).
+   Push ALL the project files: `car_ai.py`, `decision_tree.py`, `styles.py`,
+   `i18n.py`, `core.py`, `requirements.txt` and the `.streamlit` folder
+   (they must all be in the same folder — `car_ai.py` imports the other files).
+3. Go to https://share.streamlit.io , sign in with GitHub and click "Deploy an app".
+4. Paste the repository URL, branch `main`, main file path `car_ai.py`, then click Deploy.
 5. After 1-3 minutes you get a public link like https://your-app-name.streamlit.app
 
 ## What it does

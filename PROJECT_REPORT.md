@@ -239,4 +239,4 @@ pip install streamlit
 streamlit run car_ai.py
 ```
 
-Live demo: https://carmechanicexpertsystem-hooczytsfsjqzf4thweurj.streamlit.app/
+Live demo: [ADD YOUR NEW STREAMLIT CLOUD LINK HERE]
