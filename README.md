@@ -27,6 +27,9 @@ with one button. Beautiful animated interface, works on phones.
 5. After 1-3 minutes you get a public link like https://your-app-name.streamlit.app
 
 ## What it does
+- TWO MODES: (1) you know your problem -> pick 1 of 10 categories directly;
+  (2) you know NOTHING -> 16 guided screening questions, the system finds the
+  most likely problem, shows the conclusion, then continues with detailed questions
 - 10 car problems: engine won't start, overheating, brakes, strange noise/vibration,
   battery/electrical, tyres, oil leak/smoke, AC, steering, gear/clutch
 - 60 Yes/No questions + 10 report inputs (battery voltage, engine temperature, tyre pressure,

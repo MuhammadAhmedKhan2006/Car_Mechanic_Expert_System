@@ -22,6 +22,7 @@ def reset_system():
     # Start a new consultation (the language choice is kept)
     s.step = 'start'; s.patient_data = {}; s.report_data = {}
     s.risk = 0; s.reasons = []; s.balloons_done = False; s.area = "-|-"
+    s.triage = {}; s.tri_match = ''; s.notice = ''
 
 
 # ---------- Look and feel: animated, responsive CSS (one block, injected with st.markdown) ----------
@@ -138,8 +139,12 @@ step = s.step
 #  max(risk + points, 70) = emergency sign; max(risk + points, 40) = needs a mechanic today.
 # =====================================================================
 if step == 'start':
+    if s.notice != '':
+        st.warning(s.notice); s.notice = ''
     st.write("### " + (T('👋 Welcome! What problem is your car having?', '👋 خوش آمدید! آپ کی گاڑی میں کیا مسئلہ ہے؟')))
     st.write((T('Choose the problem that matches best:', 'جو مسئلہ سب سے زیادہ ملتا ہو اسے منتخب کریں:')))
+    if st.button(T("🤔 I don't know my problem - ask me questions", '🤔 مجھے اپنا مسئلہ نہیں معلوم - مجھ سے سوالات پوچھیں'), key="triage_start", type="primary"):
+        s.triage = {}; s.step = 'tri1'; st.rerun()
     c1, c2 = st.columns(2); c3, c4 = st.columns(2); c5, c6 = st.columns(2); c7, c8 = st.columns(2); c9, c10 = st.columns(2)
     if c1.button((T("🔑 Engine won't start", '🔑 انجن اسٹارٹ نہیں ہوتا')), key="s1"): s.patient_data['complaint'] = 'Engine will not start'; s.area = "Starting system (battery / starter / fuel)|اسٹارٹنگ سسٹم (بیٹری / سیلف اسٹارٹر / فیول)"; s.step = 'ns1'; st.rerun()
     elif c2.button((T('🌡️ Overheating', '🌡️ انجن زیادہ گرم ہو رہا ہے')), key="s2"): s.patient_data['complaint'] = 'Overheating'; s.area = "Cooling system (coolant / radiator / fan)|کولنگ سسٹم (کولنٹ / ریڈی ایٹر / پنکھا)"; s.step = 'oh1'; st.rerun()
@@ -628,6 +633,163 @@ elif step == 'gc6':
         s.patient_data['gearbox_leak'] = "Yes"; s.risk = s.risk + 15; s.reasons.append("Red / brown fluid leak: +15 risk|سرخ / بھورے سیال کا لیک: +15 رسک|15")
         s.step = 'end'; st.rerun()
     if c2.button(NO, key="gc6n"): s.patient_data['gearbox_leak'] = "No"; s.step = 'end'; st.rerun()
+
+# ---------- GUIDED MODE (16 screening questions -> conclusion -> normal questions) ----------
+# For users who do NOT know their problem. Each Yes adds votes to candidate
+# problem codes; tri_end picks the winner and tri_result shows the conclusion.
+elif step == 'tri1':
+    st.markdown("<div class='qcard'><div class='qtop'><span class='qno'>" + QN + "1 / 16</span><div class='qbar'><span style='width:6%'></span></div></div><div class='qtext'>" + (T('Headlights or dashboard lights look dim.', 'ہیڈ لائٹس یا ڈیش بورڈ کی لائٹس مدھم ہیں۔')) + "</div></div>", unsafe_allow_html=True); c1, c2 = st.columns(2)
+    if c1.button(YES, key="tri1y", type="primary"):
+        s.triage['el'] = s.triage.get('el', 0) + 3
+        s.step = 'tri2'; st.rerun()
+    if c2.button(NO, key="tri1n"): s.step = 'tri2'; st.rerun()
+
+elif step == 'tri2':
+    st.markdown("<div class='qcard'><div class='qtop'><span class='qno'>" + QN + "2 / 16</span><div class='qbar'><span style='width:12%'></span></div></div><div class='qtext'>" + (T('The engine cranks slowly or clicks when starting.', 'سٹارٹ کرتے وقت انجن آہستہ گھومتا ہے یا کلک کی آواز آتی ہے۔')) + "</div></div>", unsafe_allow_html=True); c1, c2 = st.columns(2)
+    if c1.button(YES, key="tri2y", type="primary"):
+        s.triage['ns'] = s.triage.get('ns', 0) + 3
+        s.triage['el'] = s.triage.get('el', 0) + 1
+        s.step = 'tri3'; st.rerun()
+    if c2.button(NO, key="tri2n"): s.step = 'tri3'; st.rerun()
+
+elif step == 'tri3':
+    st.markdown("<div class='qcard'><div class='qtop'><span class='qno'>" + QN + "3 / 16</span><div class='qbar'><span style='width:18%'></span></div></div><div class='qtext'>" + (T('Nothing happens at all when you turn the key.', 'چابی گھمانے پر بالکل کچھ نہیں ہوتا۔')) + "</div></div>", unsafe_allow_html=True); c1, c2 = st.columns(2)
+    if c1.button(YES, key="tri3y", type="primary"):
+        s.triage['ns'] = s.triage.get('ns', 0) + 3
+        s.triage['el'] = s.triage.get('el', 0) + 2
+        s.step = 'tri4'; st.rerun()
+    if c2.button(NO, key="tri3n"): s.step = 'tri4'; st.rerun()
+
+elif step == 'tri4':
+    st.markdown("<div class='qcard'><div class='qtop'><span class='qno'>" + QN + "4 / 16</span><div class='qbar'><span style='width:25%'></span></div></div><div class='qtext'>" + (T('The car stalls, hesitates or loses power.', 'گاڑی رک جاتی ہے، ہچکچاتی ہے یا طاقت کم ہوتی ہے۔')) + "</div></div>", unsafe_allow_html=True); c1, c2 = st.columns(2)
+    if c1.button(YES, key="tri4y", type="primary"):
+        s.triage['el'] = s.triage.get('el', 0) + 2
+        s.triage['nv'] = s.triage.get('nv', 0) + 1
+        s.step = 'tri5'; st.rerun()
+    if c2.button(NO, key="tri4n"): s.step = 'tri5'; st.rerun()
+
+elif step == 'tri5':
+    st.markdown("<div class='qcard'><div class='qtop'><span class='qno'>" + QN + "5 / 16</span><div class='qbar'><span style='width:31%'></span></div></div><div class='qtext'>" + (T('The temperature gauge is in the red, or steam comes from under the bonnet.', 'ٹیمپریچر گیج سرخ زون میں ہے یا بونٹ سے بھاپ آتی ہے۔')) + "</div></div>", unsafe_allow_html=True); c1, c2 = st.columns(2)
+    if c1.button(YES, key="tri5y", type="primary"):
+        s.triage['oh'] = s.triage.get('oh', 0) + 4
+        s.step = 'tri6'; st.rerun()
+    if c2.button(NO, key="tri5n"): s.step = 'tri6'; st.rerun()
+
+elif step == 'tri6':
+    st.markdown("<div class='qcard'><div class='qtop'><span class='qno'>" + QN + "6 / 16</span><div class='qbar'><span style='width:37%'></span></div></div><div class='qtext'>" + (T('The brake pedal feels soft or sinks to the floor.', 'بریک پیڈل نرم ہے یا فرش تک چلا جاتا ہے۔')) + "</div></div>", unsafe_allow_html=True); c1, c2 = st.columns(2)
+    if c1.button(YES, key="tri6y", type="primary"):
+        s.triage['br'] = s.triage.get('br', 0) + 4
+        s.step = 'tri7'; st.rerun()
+    if c2.button(NO, key="tri6n"): s.step = 'tri7'; st.rerun()
+
+elif step == 'tri7':
+    st.markdown("<div class='qcard'><div class='qtop'><span class='qno'>" + QN + "7 / 16</span><div class='qbar'><span style='width:43%'></span></div></div><div class='qtext'>" + (T('You hear squealing or grinding when you brake.', 'بریک لگاتے وقت چیخ یا رگڑ کی آواز آتی ہے۔')) + "</div></div>", unsafe_allow_html=True); c1, c2 = st.columns(2)
+    if c1.button(YES, key="tri7y", type="primary"):
+        s.triage['br'] = s.triage.get('br', 0) + 3
+        s.triage['nv'] = s.triage.get('nv', 0) + 1
+        s.step = 'tri8'; st.rerun()
+    if c2.button(NO, key="tri7n"): s.step = 'tri8'; st.rerun()
+
+elif step == 'tri8':
+    st.markdown("<div class='qcard'><div class='qtop'><span class='qno'>" + QN + "8 / 16</span><div class='qbar'><span style='width:50%'></span></div></div><div class='qtext'>" + (T('The car pulls to one side when you brake.', 'بریک لگانے پر گاڑی ایک طرف کھنچتی ہے۔')) + "</div></div>", unsafe_allow_html=True); c1, c2 = st.columns(2)
+    if c1.button(YES, key="tri8y", type="primary"):
+        s.triage['br'] = s.triage.get('br', 0) + 3
+        s.triage['ty'] = s.triage.get('ty', 0) + 1
+        s.step = 'tri9'; st.rerun()
+    if c2.button(NO, key="tri8n"): s.step = 'tri9'; st.rerun()
+
+elif step == 'tri9':
+    st.markdown("<div class='qcard'><div class='qtop'><span class='qno'>" + QN + "9 / 16</span><div class='qbar'><span style='width:56%'></span></div></div><div class='qtext'>" + (T('There is knocking or rumbling from the engine.', 'انجن سے کھٹکھٹاہٹ یا گرج سنائی دیتی ہے۔')) + "</div></div>", unsafe_allow_html=True); c1, c2 = st.columns(2)
+    if c1.button(YES, key="tri9y", type="primary"):
+        s.triage['nv'] = s.triage.get('nv', 0) + 3
+        s.step = 'tri10'; st.rerun()
+    if c2.button(NO, key="tri9n"): s.step = 'tri10'; st.rerun()
+
+elif step == 'tri10':
+    st.markdown("<div class='qcard'><div class='qtop'><span class='qno'>" + QN + "10 / 16</span><div class='qbar'><span style='width:62%'></span></div></div><div class='qtext'>" + (T('Blue or grey smoke comes from the exhaust.', 'ایگزاسٹ سے نیلا یا خاکستری دھواں آتا ہے۔')) + "</div></div>", unsafe_allow_html=True); c1, c2 = st.columns(2)
+    if c1.button(YES, key="tri10y", type="primary"):
+        s.triage['ol'] = s.triage.get('ol', 0) + 3
+        s.triage['nv'] = s.triage.get('nv', 0) + 1
+        s.step = 'tri11'; st.rerun()
+    if c2.button(NO, key="tri10n"): s.step = 'tri11'; st.rerun()
+
+elif step == 'tri11':
+    st.markdown("<div class='qcard'><div class='qtop'><span class='qno'>" + QN + "11 / 16</span><div class='qbar'><span style='width:68%'></span></div></div><div class='qtext'>" + (T('Black smoke comes from the exhaust.', 'ایگزاسٹ سے کالا دھواں آتا ہے۔')) + "</div></div>", unsafe_allow_html=True); c1, c2 = st.columns(2)
+    if c1.button(YES, key="tri11y", type="primary"):
+        s.triage['ol'] = s.triage.get('ol', 0) + 3
+        s.triage['nv'] = s.triage.get('nv', 0) + 1
+        s.step = 'tri12'; st.rerun()
+    if c2.button(NO, key="tri11n"): s.step = 'tri12'; st.rerun()
+
+elif step == 'tri12':
+    st.markdown("<div class='qcard'><div class='qtop'><span class='qno'>" + QN + "12 / 16</span><div class='qbar'><span style='width:75%'></span></div></div><div class='qtext'>" + (T('The AC blows warm air or the airflow is weak.', 'اے سی گرم ہوا دیتا ہے یا ہوا کی رفتار کم ہے۔')) + "</div></div>", unsafe_allow_html=True); c1, c2 = st.columns(2)
+    if c1.button(YES, key="tri12y", type="primary"):
+        s.triage['ac'] = s.triage.get('ac', 0) + 4
+        s.step = 'tri13'; st.rerun()
+    if c2.button(NO, key="tri12n"): s.step = 'tri13'; st.rerun()
+
+elif step == 'tri13':
+    st.markdown("<div class='qcard'><div class='qtop'><span class='qno'>" + QN + "13 / 16</span><div class='qbar'><span style='width:81%'></span></div></div><div class='qtext'>" + (T('Changing gears is difficult, or you hear grinding while shifting.', 'گیئر بدلنا مشکل ہے یا بدلتے وقت رگڑ کی آواز آتی ہے۔')) + "</div></div>", unsafe_allow_html=True); c1, c2 = st.columns(2)
+    if c1.button(YES, key="tri13y", type="primary"):
+        s.triage['gc'] = s.triage.get('gc', 0) + 4
+        s.step = 'tri14'; st.rerun()
+    if c2.button(NO, key="tri13n"): s.step = 'tri14'; st.rerun()
+
+elif step == 'tri14':
+    st.markdown("<div class='qcard'><div class='qtop'><span class='qno'>" + QN + "14 / 16</span><div class='qbar'><span style='width:87%'></span></div></div><div class='qtext'>" + (T('The steering wheel shakes at higher speeds.', 'تیز رفتار پر اسٹیئرنگ کانپتا ہے۔')) + "</div></div>", unsafe_allow_html=True); c1, c2 = st.columns(2)
+    if c1.button(YES, key="tri14y", type="primary"):
+        s.triage['ty'] = s.triage.get('ty', 0) + 3
+        s.triage['sr'] = s.triage.get('sr', 0) + 2
+        s.step = 'tri15'; st.rerun()
+    if c2.button(NO, key="tri14n"): s.step = 'tri15'; st.rerun()
+
+elif step == 'tri15':
+    st.markdown("<div class='qcard'><div class='qtop'><span class='qno'>" + QN + "15 / 16</span><div class='qbar'><span style='width:93%'></span></div></div><div class='qtext'>" + (T('Tyres look worn or flat, or the car pulls to one side while driving straight.', 'ٹائر گھسے ہوئے یا پچکے ہیں، یا سیدھی سڑک پر گاڑی ایک طرف کھنچتی ہے۔')) + "</div></div>", unsafe_allow_html=True); c1, c2 = st.columns(2)
+    if c1.button(YES, key="tri15y", type="primary"):
+        s.triage['ty'] = s.triage.get('ty', 0) + 4
+        s.triage['sr'] = s.triage.get('sr', 0) + 1
+        s.step = 'tri16'; st.rerun()
+    if c2.button(NO, key="tri15n"): s.step = 'tri16'; st.rerun()
+
+elif step == 'tri16':
+    st.markdown("<div class='qcard'><div class='qtop'><span class='qno'>" + QN + "16 / 16</span><div class='qbar'><span style='width:100%'></span></div></div><div class='qtext'>" + (T('You see oil spots or puddles under the car.', 'گاڑی کے نیچے آئل کے دھبے یا چھینٹے نظر آتے ہیں۔')) + "</div></div>", unsafe_allow_html=True); c1, c2 = st.columns(2)
+    if c1.button(YES, key="tri16y", type="primary"):
+        s.triage['ol'] = s.triage.get('ol', 0) + 4
+        s.step = 'tri_end'; st.rerun()
+    if c2.button(NO, key="tri16n"): s.step = 'tri_end'; st.rerun()
+elif step == 'tri_end':
+    # pick the problem code with the most votes (first one wins a tie)
+    best = ''; best_v = 0
+    for code in ['ns','oh','br','nv','el','ty','ol','ac','sr','gc']:
+        v = s.triage.get(code, 0)
+        if v > best_v: best_v = v; best = code
+    if best == '':
+        s.notice = T('We could not find a clear match - please choose the closest problem from the list.', 'ہم کوئی واضح میل نہیں پا سکے - براہ کرم فہرست سے قریب ترین مسئلہ منتخب کریں۔')
+        s.step = 'start'; st.rerun()
+    s.tri_match = best; s.step = 'tri_result'; st.rerun()
+elif step == 'tri_result':
+    # conclusion screen: show the matched problem, then continue to its questions
+    M = {'ns': ('ns1', 'Engine will not start', "Starting system (battery / starter / fuel)|اسٹارٹنگ سسٹم (بیٹری / سیلف اسٹارٹر / فیول)"),
+         'oh': ('oh1', 'Overheating', "Cooling system (coolant / radiator / fan)|کولنگ سسٹم (کولنٹ / ریڈی ایٹر / پنکھا)"),
+         'br': ('br1', 'Brake problem', "Brake system (pads / fluid / discs)|بریک سسٹم (پیڈز / فلوئڈ / ڈسک)"),
+         'nv': ('nv1', 'Strange noise or vibration', "Engine, belts or suspension (source of the noise)|انجن، بیلٹ یا سسپنشن (آواز کا ماخذ)"),
+         'el': ('el1', 'Battery / electrical / lights', "Electrical system (battery / charging / wiring)|بجلی کا نظام (بیٹری / چارجنگ / وائرنگ)"),
+         'ty': ('ty1', 'Tyre problem', "Tyres and wheels|ٹائر اور پہیے"),
+         'ol': ('ol1', 'Oil leak or smoke', "Engine oil system (oil level / leaks / burning oil)|انجن آئل سسٹم (آئل کی سطح / لیک / جلتا آئل)"),
+         'ac': ('ac1', 'AC not cooling', "Air conditioning system (gas / filter / compressor)|ایئر کنڈیشننگ سسٹم (گیس / فلٹر / کمپریسر)"),
+         'sr': ('sr1', 'Steering problem', "Steering system (fluid / alignment / tyres)|اسٹیئرنگ سسٹم (فلوئڈ / الائنمنٹ / ٹائر)"),
+         'gc': ('gc1', 'Gear or clutch problem', "Gearbox and clutch|گیئر باکس اور کلچ")}
+    stp, comp_en, ar = M[s.tri_match]
+    ap = ar.split("|")
+    area_txt = ap[1] if (L == 'ur' and len(ap) > 1) else ap[0]
+    st.success(T('🎯 Based on your answers, the closest match is:', '🎯 آپ کے جوابات کی بنیاد پر سب سے قریب مسئلہ:'))
+    st.write("### " + (T('🔧 ' + comp_en, '🔧 ' + {'ns':'انجن اسٹارٹ نہیں ہوتا','oh':'انجن زیادہ گرم ہو رہا ہے','br':'بریک کا مسئلہ','nv':'عجیب آواز یا جھٹکے','el':'بیٹری / بجلی / لائٹس کا مسئلہ','ty':'ٹائر کا مسئلہ','ol':'آئل لیک / دھواں','ac':'اے سی ٹھنڈا نہیں کر رہا','sr':'اسٹیئرنگ کا مسئلہ','gc':'گیئر / کلچ کا مسئلہ'}[s.tri_match])))
+    st.write(T('🔍 Possible area to check: ', '🔍 چیک کرنے کا ممکنہ حصہ: ') + area_txt)
+    st.info(T('Now we will ask a few more questions about this problem, then give you a suggestion, defend it, and give you a report for the mechanic.', 'اب ہم اس مسئلے کے بارے میں چند مزید سوالات کریں گے، پھر مشورہ دیں گے، اس کی وضاحت کریں گے اور مکینک کے لیے رپورٹ دیں گے۔'))
+    if st.button(T('➡️ Continue with these questions', '➡️ ان سوالات کے ساتھ جاری رکھیں'), key="tri_go", type="primary"):
+        s.patient_data['complaint'] = comp_en; s.area = ar; s.step = stp; st.rerun()
+    if st.button(T('⬅️ Start over / choose a different problem', '⬅️ دوبارہ شروع کریں / دوسرا مسئلہ منتخب کریں'), key="tri_back"):
+        reset_system(); st.rerun()
 
 # ================== FINAL STEP : DECISION + DEFENCE + SUPPORT ==================
 elif step == 'end':

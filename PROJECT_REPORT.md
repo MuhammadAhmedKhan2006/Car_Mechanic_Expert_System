@@ -34,6 +34,9 @@ It is a **decision support tool only — it never gives a final diagnosis**.
 
 ## 4. Features
 
+- Guided mode: 16 screening questions for users who do not know their problem;
+  the answers are scored per category and the best match is shown as a conclusion
+  before the detailed questions begin.
 - 10 problem categories: engine won't start, overheating, brakes, strange noise/vibration,
   battery/electrical/lights, tyres, oil leak/smoke, AC, steering, gear/clutch.
 - 6 guided questions per category (60 Yes/No questions total).
