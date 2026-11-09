@@ -46,16 +46,13 @@ It is a **decision support tool only — it never gives a final diagnosis**.
 
 ## 5. Code Explanation (in easy English)
 
-The app is split into 5 small Python files. Only two outside libraries are used:
+The app is split into 2 Python files. Only two outside libraries are used:
 `streamlit` (the web UI) and `datetime` (the report date).
 
 | File | What it does |
 |---|---|
-| `car_ai.py` | Main file. Page setup, header, disclaimer, language button, then calls the decision tree. Run with `streamlit run car_ai.py`. |
-| `styles.py` | The `CSS` and `CSS_UR` strings — all the animation and layout styling. |
-| `i18n.py` | `T(en, ur)` — picks English or Urdu text for the active language. |
-| `core.py` | `reset_system()` — clears answers, risk score and reasons for a new consultation. |
-| `decision_tree.py` | The whole expert system: `run()` contains the big `if / elif` decision tree. |
+| `car_ai.py` | The Streamlit UI: page setup, all CSS styling, header, disclaimer, language button. It calls the expert system at the end. Run with `streamlit run car_ai.py`. |
+| `codebase.py` | The expert system "brain": `T(en, ur)` language picker, `reset_system()`, and `run()` — the whole decision tree with questions, rules, risk scoring and the final report. |
 
 ### 5.1 Session state and helpers
 

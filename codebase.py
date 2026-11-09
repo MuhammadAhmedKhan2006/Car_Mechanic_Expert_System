@@ -1,9 +1,20 @@
-# decision_tree.py - the one big decision tree (if / elif on s.step)
+# codebase.py - the expert system "brain": language picker, session reset,
+# and the one big decision tree (if / elif on s.step).
 # Every screen is one step; serious answers add risk points + a reason.
 import streamlit as st
 from datetime import datetime
-from i18n import T
-from core import reset_system
+
+
+def T(en, ur):
+    # Pick UI text for the active language (English or Urdu)
+    return en if st.session_state.lang == 'en' else ur
+
+
+def reset_system():
+    # Start a new consultation (the language choice is kept)
+    s = st.session_state
+    s.step = 'start'; s.patient_data = {}; s.report_data = {}
+    s.risk = 0; s.reasons = []; s.balloons_done = False; s.area = "-|-"
 
 
 def run():

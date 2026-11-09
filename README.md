@@ -5,11 +5,9 @@ It gives a suggestion, explains and defends it, and can be switched between Engl
 with one button. Beautiful animated interface, works on phones.
 
 ## Files
-- `car_ai.py`                the main Streamlit app (page setup, header, language button)
-- `styles.py`                all CSS (injected once per run)
-- `i18n.py`                  language picker `T('English', 'اردو')`
-- `core.py`                  session-state helpers (`reset_system`)
-- `decision_tree.py`         the whole decision tree: questions, rules, scoring, final report
+- `car_ai.py`                the Streamlit app: page setup, CSS styling, header, language button
+- `codebase.py`              the expert system: language picker, session reset, the whole decision
+                             tree (questions, rules, scoring) and the final report
 - `requirements.txt`         contains `streamlit` (used when you deploy online)
 - `.streamlit/config.toml`   light theme colours (upload this folder too when you deploy)
 
@@ -25,9 +23,9 @@ with one button. Beautiful animated interface, works on phones.
 ## Get the live (WAN) link - Streamlit Community Cloud, free
 1. Create a free GitHub account and a new PUBLIC repository (for example `car-mechanic-ai`).
 2. Create a free GitHub account and a PUBLIC repository (or use the existing one).
-   Push ALL the project files: `car_ai.py`, `decision_tree.py`, `styles.py`,
-   `i18n.py`, `core.py`, `requirements.txt` and the `.streamlit` folder
-   (they must all be in the same folder — `car_ai.py` imports the other files).
+   Push ALL the project files: `car_ai.py`, `codebase.py`, `requirements.txt`
+   and the `.streamlit` folder (they must all be in the same folder —
+   `car_ai.py` imports `codebase.py`).
 3. Go to https://share.streamlit.io , sign in with GitHub and click "Deploy an app".
 4. Paste the repository URL, branch `main`, main file path `car_ai.py`, then click Deploy.
 5. After 1-3 minutes you get a public link like https://your-app-name.streamlit.app
