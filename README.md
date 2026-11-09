@@ -5,7 +5,11 @@ It gives a suggestion, explains and defends it, and can be switched between Engl
 with one button. Beautiful animated interface, works on phones.
 
 ## Files
-- `car_ai.py`                the complete Streamlit app (no other libraries needed)
+- `car_ai.py`                the main Streamlit app (page setup, header, language button)
+- `styles.py`                all CSS (injected once per run)
+- `i18n.py`                  language picker `T('English', 'اردو')`
+- `core.py`                  session-state helpers (`reset_system`)
+- `decision_tree.py`         the whole decision tree: questions, rules, scoring, final report
 - `requirements.txt`         contains `streamlit` (used when you deploy online)
 - `.streamlit/config.toml`   light theme colours (upload this folder too when you deploy)
 
