@@ -37,6 +37,7 @@ It is a **decision support tool only — it never gives a final diagnosis**.
 - Guided mode: 16 screening questions for users who do not know their problem;
   the answers are scored per category and the best match is shown as a conclusion
   before the detailed questions begin.
+- Light and dark theme toggle; fully mobile-responsive layout.
 - 10 problem categories: engine won't start, overheating, brakes, strange noise/vibration,
   battery/electrical/lights, tyres, oil leak/smoke, AC, steering, gear/clutch.
 - 6 guided questions per category (60 Yes/No questions total).
@@ -49,13 +50,13 @@ It is a **decision support tool only — it never gives a final diagnosis**.
 
 ## 5. Code Explanation (in easy English)
 
-The whole app lives in ONE file, `car_ai.py`. Only two outside libraries are used:
-`streamlit` (the web UI) and `datetime` (the report date).
+The app is split into 2 Python files. Only two outside libraries are used:
+`streamlit` (the web UI) and `datetime` (the report date) — plain basic Python otherwise.
 
 | File | What it does |
 |---|---|
-| `car_ai.py` | Everything: page setup, CSS styling, language picker, session reset, the whole `if / elif` decision tree (all questions, rules, risk scoring) and the final report screen. Run with `streamlit run car_ai.py`. |
-| `requirements.txt` | Contains only `streamlit` — tells Streamlit Cloud what to install. |
+| `car_ai.py` | The Streamlit UI shell: page setup, all CSS (light + dark theme via CSS variables), header, disclaimer, language and theme buttons. Run with `streamlit run car_ai.py`. |
+| `codebase.py` | The expert system "brain": `T(en, ur)` language picker, `reset_system()`, and `run()` — guided mode + the whole `if / elif` decision tree (all questions, rules, risk scoring) and the final report screen. |
 
 ### 5.1 Session state and helpers
 

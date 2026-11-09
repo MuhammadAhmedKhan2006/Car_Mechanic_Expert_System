@@ -5,14 +5,17 @@ It gives a suggestion, explains and defends it, and can be switched between Engl
 with one button. Beautiful animated interface, works on phones.
 
 ## Files
-- `car_ai.py`                the complete Streamlit app (no other libraries needed)
+- `car_ai.py`                the Streamlit app: page setup, CSS styling (light + dark theme),
+                             header, language and theme buttons
+- `codebase.py`              the expert system: language picker, session reset, the whole
+                             decision tree (guided mode, questions, rules, scoring, report)
 - `requirements.txt`         contains `streamlit` (used when you deploy online)
 - `.streamlit/config.toml`   light theme colours (upload this folder too when you deploy)
 
 ## Run on your computer
 1. Install Python 3.9+ (tick "Add Python to PATH" on Windows).
 2. Open a terminal in this folder and run:  pip install streamlit
-3. Run:  streamlit run car_ai.py
+3. Run:  streamlit run car_ai.py   (codebase.py must be in the same folder)
 4. Open http://localhost:8501 if the browser does not open by itself. Stop with Ctrl + C.
    If `streamlit` is not recognised, use:  python -m streamlit run car_ai.py
 5. To test the phone layout: open the page and press F12, then the device toolbar (or open the
@@ -20,8 +23,8 @@ with one button. Beautiful animated interface, works on phones.
 
 ## Get the live (WAN) link - Streamlit Community Cloud, free
 1. Create a free GitHub account and a PUBLIC repository (for example `car-mechanic-ai`).
-2. Upload `car_ai.py`, `requirements.txt` and the `.streamlit` folder to the repository
-   (Add file -> Upload files; drag the whole folder content).
+2. Upload ALL project files to the repository: `car_ai.py`, `codebase.py`,
+   `requirements.txt` and the `.streamlit` folder (they must be in the same folder).
 3. Go to https://share.streamlit.io , sign in with GitHub and click "Create app".
 4. Choose the repository, branch `main`, main file path `car_ai.py`, then click Deploy.
 5. After 1-3 minutes you get a public link like https://your-app-name.streamlit.app
@@ -41,8 +44,9 @@ with one button. Beautiful animated interface, works on phones.
   confidence), action plan
 - EXTRA FEATURES: (1) the defence panel with confidence / decision margin,
   (2) a downloadable "Mechanic Report" text file the owner can show to the mechanic
-- UI: animated gradient hero with a driving car, question cards with progress bar, animated
-  risk meter, pulsing emergency card, balloons for a good result, mobile responsive layout
-  (Yes/No buttons stay side by side on phones), full English/Urdu switch with right-to-left layout
+- UI: animated gradient hero, question cards with progress bar, animated
+  risk meter, pulsing emergency card, balloons for a good result, mobile responsive
+  layout (works on phones), full English/Urdu switch with right-to-left layout,
+  and a Light/Dark theme toggle button
 - Safe wording: it never gives a final diagnosis; it always says to get the car checked
   by a qualified mechanic (or to stop the car and call a tow truck in an emergency)
